@@ -1,5 +1,6 @@
 import os
 from threading import Thread
+import discord
 from flask import Flask
 
 app = Flask('')
@@ -20,8 +21,19 @@ def keep_alive():
   t.start()
 
 
-# تشغيل خادم الويب قبل تشغيل البوت
+# تشغيل خادم الويب للحفاظ على نشاط البوت
 keep_alive()
 
-# ضع سطر تشغيل البوت الخاص بك هنا في الأسفل:
-client.run(MTU2MjExMjMzMjI3OTA1NDQxOA.Gzhn3T.VkoKW_msRjLgCwEq9JVQfqE6huC1NkuOgAmSwA)
+# إعدادات بوت الديسكورد الأساسية
+intents = discord.Intents.default()
+intents.message_content = True
+bot = discord.Client(intents=intents)
+
+
+@bot.event
+async def on_ready():
+  print(f'Logged in as {bot.user}')
+
+
+# تشغيل البوت مع وضع التوكن الخاص بك هنا بين علامتي التنصيص
+bot.run('MTU2MjExMjMzMjI3OTA1X0Fqhn3T.VkoKW_msRjLgCWeq9JVqFQe6huC1Nku0gAmSWa')
