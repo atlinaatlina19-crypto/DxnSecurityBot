@@ -159,11 +159,4 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# أوامر الإدارة العادية
-@bot.command()
-@commands.has_permissions(manage_messages=True)
-async def clear(ctx, amount: int = 10):
-    await ctx.channel.purge(limit=amount + 1)
-    await ctx.send(f"🧹 تم مسح {amount} رسالة!", delete_after=3)
-
 bot.run(os.environ.get('DISCORD_TOKEN'))
