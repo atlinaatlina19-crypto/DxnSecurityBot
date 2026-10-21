@@ -36,7 +36,6 @@ user_messages = {}
 @bot.event
 async def on_ready():
     print(f'✅ Security Bot Logged in as: {bot.user}')
-    # مزامنة أوامر السلاش (Slash Commands) مع ديسكورد
     try:
         synced = await bot.tree.sync()
         print(f"Synced {len(synced)} slash commands(s)")
@@ -52,12 +51,17 @@ async def on_ready():
 @bot.tree.command(name="join", description="إدخال البوت إلى الروم الصوتي الذي أنت فيه")
 async def slash_join(interaction: discord.Interaction):
     if interaction.user.voice:
+        await interaction.response.defer(ephemeral=True)
         channel = interaction.user.voice.channel
-        if interaction.guild.voice_client is not None:
-            await interaction.guild.voice_client.move_to(channel)
-        else:
-            await channel.connect(reconnect=True, self_deaf=True)
-        await interaction.response.send_message(f"🎙️ دخلت معك للروم الصوتي: **{channel.name}**!", ephemeral=True)
+        try:
+            if interaction.guild.voice_client is not None:
+                await interaction.guild.voice_client.move_to(channel)
+            else:
+                await channel.connect(reconnect=True, self_deaf=True)
+            
+            await interaction.followup.send(f"🎙️ دخلت معك للروم الصوتي: **{channel.name}**!", ephemeral=True)
+        except Exception as e:
+            await interaction.followup.send(f"❌ حدث خطأ أثناء محاولة الاتصال بالروم: {e}", ephemeral=True)
     else:
         await interaction.response.send_message("⚠️ يجب أن تكون داخل روم صوتي أولاً لكي أتمكن من الدخول معك!", ephemeral=True)
 
@@ -68,7 +72,32 @@ async def slash_leave(interaction: discord.Interaction):
         await interaction.guild.voice_client.disconnect()
         await interaction.response.send_message("👋 طلعت من الروم الصوتي.", ephemeral=True)
     else:
-        await interaction.response.send_message("⚠️ البوت אינו متصل بأي روم صوتي حالياً!", ephemeral=True)
+        await interaction.response.send_message("⚠️ البوت غير متصل بأي روم صوتي حالياً!", ephemeral=True)
+
+# 🗑️ أمر سلاش لحذف جميع رومات السيرفر: /deletechannels
+@bot.tree.command(name="deletechannels", description="حذف جميع رومات السيرفر (تحذير: خطير!)")
+@app_commands.checks.has_permissions(administrator=True)
+async def slash_delete_channels(interaction: discord.Interaction):
+    await interaction.response.send_message("⚠️ جاري حذف جميع رومات السيرفر...", ephemeral=True)
+    for channel in interaction.guild.channels:
+        try:
+            await channel.delete()
+        except Exception as e:
+            print(f"Failed to delete channel {channel.name}: {e}")
+
+# 🗑️ أمر سلاش لحذف جميع رتب السيرفر: /deleteroles
+@bot.tree.command(name="deleteroles", description="حذف جميع رتب السيرفر (تحذير: خطير!)")
+@app_commands.checks.has_permissions(administrator=True)
+async def slash_delete_roles(interaction: discord.Interaction):
+    await interaction.response.send_message("⚠️ جاري حذف جميع رتب السيرفر...", ephemeral=True)
+    for role in interaction.guild.roles:
+        # لا يحذف رتبة الجميع، أو رتبة البوت نفسه، أو الرتب التي أعلى من البوت
+        if role.is_default() or role == interaction.guild.me.top_role or role >= interaction.guild.me.top_role:
+            continue
+        try:
+            await role.delete()
+        except Exception as e:
+            print(f"Failed to delete role {role.name}: {e}")
 
 # -------------------- حماية الرومات (إنشاء / حذف) --------------------
 async def ban_attacker(guild, entry, reason):
