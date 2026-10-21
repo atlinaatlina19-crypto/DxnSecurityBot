@@ -35,5 +35,5 @@ async def on_ready():
   print(f'Logged in as {bot.user}')
 
 
-# تشغيل البوت مع وضع التوكن الخاص بك هنا بين علامتي التنصيص
-bot.run("MTU2MjExMjMzMjI3OTA1NDQxOA.Gv_3o5.o0Zd3tA6NIoZpXgAhqYiDf7Whxp_uvnrFITvrs")
+# قراءة التوكن بأمان من متغيرات البيئة
+bot.run(os.environ.get('DISCORD_TOKEN'))
