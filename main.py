@@ -76,7 +76,7 @@ async def slash_leave(interaction: discord.Interaction):
 
 # 🗑️ أمر سلاش لحذف جميع رومات السيرفر: /deletechannels
 @bot.tree.command(name="deletechannels", description="حذف جميع رومات السيرفر (تحذير: خطير!)")
-@app_commands.checks.has_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 async def slash_delete_channels(interaction: discord.Interaction):
     await interaction.response.send_message("⚠️ جاري حذف جميع رومات السيرفر...", ephemeral=True)
     for channel in interaction.guild.channels:
@@ -87,11 +87,10 @@ async def slash_delete_channels(interaction: discord.Interaction):
 
 # 🗑️ أمر سلاش لحذف جميع رتب السيرفر: /deleteroles
 @bot.tree.command(name="deleteroles", description="حذف جميع رتب السيرفر (تحذير: خطير!)")
-@app_commands.checks.has_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 async def slash_delete_roles(interaction: discord.Interaction):
     await interaction.response.send_message("⚠️ جاري حذف جميع رتب السيرفر...", ephemeral=True)
     for role in interaction.guild.roles:
-        # لا يحذف رتبة الجميع، أو رتبة البوت نفسه، أو الرتب التي أعلى من البوت
         if role.is_default() or role == interaction.guild.me.top_role or role >= interaction.guild.me.top_role:
             continue
         try:
