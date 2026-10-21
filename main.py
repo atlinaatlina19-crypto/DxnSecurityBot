@@ -23,12 +23,11 @@ def keep_alive():
 
 keep_alive()
 
-# إعدادات البوت
+# إعدادات البوت بدون تفعيل حالة الصوت لتجنب مشاكل بايثون 3.14
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.guilds = True
-intents.voice_states = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 user_messages = {}
@@ -46,32 +45,6 @@ async def on_ready():
         type=discord.ActivityType.watching, 
         name="🛡️ Protecting Server & Anti-Nuke"
     ))
-
-# 🎙️ أمر سلاش لدخول الروم (آمن تماماً ضد أخطاء البيئة)
-@bot.tree.command(name="join", description="إدخال البوت إلى الروم الصوتي")
-async def slash_join(interaction: discord.Interaction):
-    if interaction.user.voice:
-        await interaction.response.defer(ephemeral=True)
-        channel = interaction.user.voice.channel
-        try:
-            if interaction.guild.voice_client is not None:
-                await interaction.guild.voice_client.move_to(channel)
-            else:
-                await channel.connect(reconnect=True, self_deaf=True)
-            await interaction.followup.send(f"🎙️ دخلت معك للروم الصوتي: **{channel.name}**!", ephemeral=True)
-        except Exception as e:
-            await interaction.followup.send(f"⚠️ ميزة الصوت تتطلب بيئة بايثون قديمة غير متوفرة حالياً بالنسخة المجانية، لكن أوامر الحماية والأمان تعمل بكامل طاقتها!", ephemeral=True)
-    else:
-        await interaction.response.send_message("⚠️ يجب أن تكون داخل روم صوتي أولاً!", ephemeral=True)
-
-# 🎙️ أمر سلاش لإخراج البوت من الروم
-@bot.tree.command(name="leave", description="إخراج البوت من الروم الصوتي")
-async def slash_leave(interaction: discord.Interaction):
-    if interaction.guild.voice_client:
-        await interaction.guild.voice_client.disconnect()
-        await interaction.response.send_message("👋 طلعت من الروم الصوتي.", ephemeral=True)
-    else:
-        await interaction.response.send_message("⚠️ البوت غير متصل بأي روم صوتي حالياً!", ephemeral=True)
 
 # 🗑️ أمر سلاش لحذف جميع رومات السيرفر: /deletechannels
 @bot.tree.command(name="deletechannels", description="حذف جميع رومات السيرفر (تحذير: خطير!)")
