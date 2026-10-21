@@ -36,30 +36,39 @@ user_messages = {}
 @bot.event
 async def on_ready():
     print(f'✅ Security Bot Logged in as: {bot.user}')
+    # مزامنة أوامر السلاش (Slash Commands) مع ديسكورد
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} slash commands(s)")
+    except Exception as e:
+        print(e)
+    
     await bot.change_presence(activity=discord.Activity(
         type=discord.ActivityType.watching, 
         name="🛡️ Protecting Server & Anti-Nuke"
     ))
 
-# 🎙️ أمر يدوي لدخول البوت إلى الروم الصوتي فوراً
-@bot.command()
-async def join(ctx):
-    if ctx.author.voice:
-        channel = ctx.author.voice.channel
-        if ctx.guild.voice_client is not None:
-            await ctx.guild.voice_client.move_to(channel)
+# 🎙️ أمر سلاش لدخول البوت إلى الروم الصوتي: /join
+@bot.tree.command(name="join", description="إدخال البوت إلى الروم الصوتي الذي أنت فيه")
+async def slash_join(interaction: discord.Interaction):
+    if interaction.user.voice:
+        channel = interaction.user.voice.channel
+        if interaction.guild.voice_client is not None:
+            await interaction.guild.voice_client.move_to(channel)
         else:
             await channel.connect(reconnect=True, self_deaf=True)
-        await ctx.send(f"🎙️ دخلت معك للروم الصوتي: **{channel.name}**!", delete_after=5)
+        await interaction.response.send_message(f"🎙️ دخلت معك للروم الصوتي: **{channel.name}**!", ephemeral=True)
     else:
-        await ctx.send("⚠️ يجب أن تكون داخل روم صوتي أولاً لكي أتمكن من الدخول معك!", delete_after=5)
+        await interaction.response.send_message("⚠️ يجب أن تكون داخل روم صوتي أولاً لكي أتمكن من الدخول معك!", ephemeral=True)
 
-# أمر إخراج البوت من الروم (إذا احتجت له)
-@bot.command()
-async def leave(ctx):
-    if ctx.guild.voice_client:
-        await ctx.guild.voice_client.disconnect()
-        await ctx.send("👋 طلعت من الروم الصوتي.", delete_after=5)
+# 🎙️ أمر سلاش لإخراج البوت من الروم: /leave
+@bot.tree.command(name="leave", description="إخراج البوت من الروم الصوتي")
+async def slash_leave(interaction: discord.Interaction):
+    if interaction.guild.voice_client:
+        await interaction.guild.voice_client.disconnect()
+        await interaction.response.send_message("👋 طلعت من الروم الصوتي.", ephemeral=True)
+    else:
+        await interaction.response.send_message("⚠️ البوت אינו متصل بأي روم صوتي حالياً!", ephemeral=True)
 
 # -------------------- حماية الرومات (إنشاء / حذف) --------------------
 async def ban_attacker(guild, entry, reason):
@@ -122,7 +131,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# أوامر الإدارة العامة
+# أوامر الإدارة العادية
 @bot.command()
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, amount: int = 10):
