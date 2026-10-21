@@ -47,7 +47,7 @@ async def on_ready():
         name="🛡️ Protecting Server & Anti-Nuke"
     ))
 
-# 🎙️ أمر سلاش لدخول الروم (آمن ضد أخطاء المكتبة)
+# 🎙️ أمر سلاش لدخول الروم (آمن تماماً ضد أخطاء البيئة)
 @bot.tree.command(name="join", description="إدخال البوت إلى الروم الصوتي")
 async def slash_join(interaction: discord.Interaction):
     if interaction.user.voice:
@@ -60,7 +60,7 @@ async def slash_join(interaction: discord.Interaction):
                 await channel.connect(reconnect=True, self_deaf=True)
             await interaction.followup.send(f"🎙️ دخلت معك للروم الصوتي: **{channel.name}**!", ephemeral=True)
         except Exception as e:
-            await interaction.followup.send(f"⚠️ مكتبة الصوت غير مدعومة بهذا الإصدار على السيرفر المجاني، لكن أداة الحماية والأوامر تعمل بامتياز!", ephemeral=True)
+            await interaction.followup.send(f"⚠️ ميزة الصوت تتطلب بيئة بايثون قديمة غير متوفرة حالياً بالنسخة المجانية، لكن أوامر الحماية والأمان تعمل بكامل طاقتها!", ephemeral=True)
     else:
         await interaction.response.send_message("⚠️ يجب أن تكون داخل روم صوتي أولاً!", ephemeral=True)
 
