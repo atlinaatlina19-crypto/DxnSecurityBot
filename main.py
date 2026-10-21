@@ -36,4 +36,4 @@ async def on_ready():
 
 
 # تشغيل البوت مع وضع التوكن الخاص بك هنا بين علامتي التنصيص
-bot.run('MTU2MjExMjMzMjI3OTA1X0Fqhn3T.VkoKW_msRjLgCWeq9JVqFQe6huC1Nku0gAmSWa')
+bot.run(MTU2MjExMjMzMjI3OTA1NDQxOA.GncLTs.L-_YEJvnQpX6z-imBI60TQi15qlJjry2uD_ips)
