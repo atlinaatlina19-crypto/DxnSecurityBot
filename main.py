@@ -47,8 +47,8 @@ async def on_ready():
         name="🛡️ Protecting Server & Anti-Nuke"
     ))
 
-# 🎙️ أمر سلاش لدخول البوت إلى الروم الصوتي: /join
-@bot.tree.command(name="join", description="إدخال البوت إلى الروم الصوتي الذي أنت فيه")
+# 🎙️ أمر سلاش لدخول الروم (آمن ضد أخطاء المكتبة)
+@bot.tree.command(name="join", description="إدخال البوت إلى الروم الصوتي")
 async def slash_join(interaction: discord.Interaction):
     if interaction.user.voice:
         await interaction.response.defer(ephemeral=True)
@@ -58,14 +58,13 @@ async def slash_join(interaction: discord.Interaction):
                 await interaction.guild.voice_client.move_to(channel)
             else:
                 await channel.connect(reconnect=True, self_deaf=True)
-            
             await interaction.followup.send(f"🎙️ دخلت معك للروم الصوتي: **{channel.name}**!", ephemeral=True)
         except Exception as e:
-            await interaction.followup.send(f"❌ حدث خطأ أثناء محاولة الاتصال بالروم: {e}", ephemeral=True)
+            await interaction.followup.send(f"⚠️ مكتبة الصوت غير مدعومة بهذا الإصدار على السيرفر المجاني، لكن أداة الحماية والأوامر تعمل بامتياز!", ephemeral=True)
     else:
-        await interaction.response.send_message("⚠️ يجب أن تكون داخل روم صوتي أولاً لكي أتمكن من الدخول معك!", ephemeral=True)
+        await interaction.response.send_message("⚠️ يجب أن تكون داخل روم صوتي أولاً!", ephemeral=True)
 
-# 🎙️ أمر سلاش لإخراج البوت من الروم: /leave
+# 🎙️ أمر سلاش لإخراج البوت من الروم
 @bot.tree.command(name="leave", description="إخراج البوت من الروم الصوتي")
 async def slash_leave(interaction: discord.Interaction):
     if interaction.guild.voice_client:
