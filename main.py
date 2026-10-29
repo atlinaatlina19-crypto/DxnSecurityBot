@@ -38,7 +38,7 @@ async def on_ready():
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
-# ==================== أوامر الحماية وإدارة السيرفر ====================
+# ==================== أوامر الحماية وإدارة السيرفر القديمة ====================
 
 @bot.tree.command(name="deletechannels", description="حذف جميع رومات السيرفر")
 async def deletechannels(interaction: discord.Interaction):
@@ -59,17 +59,23 @@ async def deleteroles(interaction: discord.Interaction):
     except Exception as e:
         print(f"Error deleting roles: {e}")
 
-# ==================== أمر الـ Join الصوتي ====================
+# ==================== أمر الـ Join الصوتي المحسّن ====================
 
 @bot.tree.command(name="join", description="يجعل البوت ينضم إلى الروم الصوتي الخاص بك")
 async def join(interaction: discord.Interaction):
     if interaction.user.voice and interaction.user.voice.channel:
+        # تأخير الاستجابة لمنع خطأ The application did not respond
+        await interaction.response.defer(ephemeral=True)
+        
         channel = interaction.user.voice.channel
-        if interaction.guild.voice_client is not None:
-            await interaction.guild.voice_client.move_to(channel)
-        else:
-            await channel.connect()
-        await interaction.response.send_message(f"تم الانضمام بنجاح إلى الروم: **{channel.name}** ✅", ephemeral=True)
+        try:
+            if interaction.guild.voice_client is not None:
+                await interaction.guild.voice_client.move_to(channel)
+            else:
+                await channel.connect()
+            await interaction.followup.send(f"تم الانضمام بنجاح إلى الروم: **{channel.name}** ✅", ephemeral=True)
+        except Exception as e:
+            await interaction.followup.send(f"حدث خطأ أثناء محاولة الاتصال بالروم: {e}", ephemeral=True)
     else:
         await interaction.response.send_message("يجب أن تكون متصلاً بروم صوتي أولاً لكي أتمكن من الدخول!", ephemeral=True)
 
